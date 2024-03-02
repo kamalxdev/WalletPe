@@ -1,13 +1,16 @@
 import axios from "axios";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import Loading from "../components/loading";
 
 export default function SendMoney() {
     const [amount,setAmount]=useState(0);
+    const [loading, setLoading] = useState(false);
   const [param] = useSearchParams();
   const name = param.get("name");
   const id = param.get("id");
   async function handletransfer() {
+    setLoading(true);
     await axios
       .post("https://wallet-pe.vercel.app/api/v1/account/transfer", {
         to: id,
@@ -18,13 +21,18 @@ export default function SendMoney() {
         },
       })
       .then((res) => {
+        setLoading(false);
         const { data } = res;
         alert(data.message);
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
         alert("Transfer failed");
       });
+  }
+  if(loading){
+    return <Loading loadingtext="Transferring money...."/>
   }
   return (
     <div className="flex justify-center h-screen ">
