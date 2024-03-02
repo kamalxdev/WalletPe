@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const zod = require("zod");
 const USER = require('../../models/user');
-const ACCOUNT= require('../../models/account');
+const ACCOUNT = require('../../models/account');
 const JWT = require('jsonwebtoken');
 const AuthorizeLoginedUser = require('../../middleware/AuthorizeLoginedUser');
 
@@ -69,17 +69,17 @@ router.post('/signup', async (req, res) => {
                 message: error.message
             }
         });
-        return res.status(400).json({status:400 , message: "Invalid Input", AuthError });
+        return res.status(400).json({ status: 400, message: "Invalid Input", AuthError });
     }
     const checkUser = await USER.findOne({ email: body.email });
 
     if (checkUser) {
-        return res.status(400).json({status:400 , message: "User already exists" });
+        return res.status(400).json({ status: 400, message: "User already exists" });
     }
     const newUser = await USER.create(body);
     if (newUser) {
-        await ACCOUNT.create({ user: newUser._id, balance: 1+ Math.random()*10000 });
-        return res.status(200).json({ status:200 ,message: "User registered succefully", userID: newUser._id });
+        await ACCOUNT.create({ user: newUser._id, balance: 1 + Math.random() * 10000 });
+        return res.status(200).json({ status: 200, message: "User registered succefully", userID: newUser._id });
     }
 });
 
@@ -107,17 +107,27 @@ router.put('/', AuthorizeLoginedUser, async (req, res) => {
     }
 });
 
-router.get('/bulk', AuthorizeLoginedUser, (req, res) => {
+router.get('/bulk', AuthorizeLoginedUser, async (req, res) => {
     const filter = req.query.filter || "";
-    const users = USER.find({
+    const users = await USER.find({
         $or: [
             { firstname: { $regex: filter } },
             { lastname: { $regex: filter } },
             { email: { $regex: filter } }
         ]
-    }); 
+    });
     if (users) {
-        return res.status(200).json({ message: "All users", users:users.filter((user) => { return { email: user.email, firstname: user.firstname, lastname: user.lastname } }) });
+        console.log(users);
+        const userwithouthPassword = users.map((user) => {
+            return {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                id: user._id
+            }
+        });
+        return res.status(200).json({ message: "All users", 
+        user: userwithouthPassword });
     }
 })
 

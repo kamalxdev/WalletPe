@@ -1,5 +1,5 @@
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Menu, X, ChevronDown, ChevronRight } from 'lucide-react'
 
 const menuItems = [
@@ -15,7 +15,10 @@ const menuItems = [
 
 export default function Appbar() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
-
+  // useEffect(() => {
+  //   var user = localStorage.getItem('x-auth-token')
+  //   console.log(user);
+  // }, [])
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }

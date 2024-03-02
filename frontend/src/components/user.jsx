@@ -1,19 +1,25 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
-const user = [
-  {
-    firstname: "John",
-    lastname: "Doe",
-    email: "jane@devui.com",
-  },
-  {
-    firstname: "Kamal",
-    lastname: "Singh",
-    email: "jane@devui.com",
-  },
-];
 
 export default function Users() {
+  const [user, setUser] = useState([]);
+  const [Filter, setFilter] = useState("");
+  useEffect(() => {
+    axios
+      .get(`https://wallet-pe.vercel.app/api/v1/user/bulk?filter=${Filter}`,{
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("x-auth-token")}`,
+        },
+      })
+      .then((res) => {
+        const { data } = res;
+        setUser(data.user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [Filter]);
   return (
     <>
       <section className="mx-auto w-full max-w-7xl px-4 py-4">
@@ -29,13 +35,8 @@ export default function Users() {
               className="flex h-10 w-full rounded-md border border-black/30 bg-transparent px-3 py-2 text-sm placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-black/30 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
               type="email"
               placeholder="User "
+              onChange={(e) => setFilter(e.target.value)}
             ></input>
-            <button
-              type="button"
-              className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-            >
-              Search
-            </button>
           </div>
           {/* <div>
             <button
@@ -65,8 +66,8 @@ export default function Users() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {user.map((user) => (
-                      <tr key={user.name}>
+                    {user.map((user,index) => (
+                      <tr key={index}>
                         <td className="whitespace-nowrap px-4 py-4">
                           <div className="flex items-center">
                             <div className="h-10 w-10 flex-shrink-0">
@@ -86,7 +87,7 @@ export default function Users() {
                         </td>
 
                         <td className="whitespace-nowrap px-4 py-4 text-right text-sm font-medium">
-                          <a href="#" className="text-gray-700">
+                          <a href={`/send?id=${user.id}&name=${user.firstname+" "+user.lastname}`}className="text-gray-700">
                             Send Money
                           </a>
                         </td>

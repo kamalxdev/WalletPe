@@ -4,19 +4,28 @@ import FormTitle from "../components/formtitle";
 import InputField from "../components/inputField";
 import SubmitBTN from "../components/submitBTN";
 import axios from "axios";
+import Loading from "../components/loading";
 
 export default function Signup() {
   const [data, setData] = useState({});
+  const [loading,setLoading] = useState(false);
   async function handleSubmit() {
+    setLoading(true);
     await axios
       .post(`https://wallet-pe.vercel.app/api/v1/user/signup`, data)
       .then((res) => {
+        setLoading(false);
         const { data } = res;
-        console.log(data.message);
+        alert(data.message);
       })
       .catch((err) => {
+        setLoading(false);
         console.log(err);
+        alert("An error occured");
       });
+  }
+  if(loading){
+    return <Loading loadingtext="Signing up..."/>
   }
   return (
     <FormArea>
