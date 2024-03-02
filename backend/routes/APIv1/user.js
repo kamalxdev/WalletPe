@@ -69,17 +69,17 @@ router.post('/signup', async (req, res) => {
                 message: error.message
             }
         });
-        return res.status(400).json({ message: "Invalid Input", AuthError });
+        return res.status(400).json({status:400 , message: "Invalid Input", AuthError });
     }
     const checkUser = await USER.findOne({ email: body.email });
 
     if (checkUser) {
-        return res.status(400).json({ message: "User already exists" });
+        return res.status(400).json({status:400 , message: "User already exists" });
     }
     const newUser = await USER.create(body);
     if (newUser) {
         await ACCOUNT.create({ user: newUser._id, balance: 1+ Math.random()*10000 });
-        return res.status(200).json({ message: "User created", userID: newUser._id });
+        return res.status(200).json({ status:200 ,message: "User registered succefully", userID: newUser._id });
     }
 });
 
